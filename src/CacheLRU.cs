@@ -43,7 +43,8 @@ namespace CacheLRU
             set => Update(key, value);
         }
 
-        private void Update(Tkey key, Tvalue value) {
+        public void Update(Tkey key, Tvalue value)
+        {
             Remove(key);
             Add(key, value);
         }
@@ -58,7 +59,7 @@ namespace CacheLRU
         public bool IsReadOnly => false;
 
         private Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>> Dict { get => dict; }
-        public LinkedList<KeyValuePair<Tkey, Tvalue>> Lru_order { get => lru_order; }
+        private LinkedList<KeyValuePair<Tkey, Tvalue>> Lru_order { get => lru_order; }
 
         public void Add(Tkey key, Tvalue value)
         {
@@ -120,7 +121,8 @@ namespace CacheLRU
             throw new NotImplementedException();
         }
 
-        public bool Remove(Tkey key, out Tvalue value){
+        public bool Remove(Tkey key, out Tvalue value)
+        {
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
             if (Dict.Remove(key, out node))
             {
@@ -132,6 +134,7 @@ namespace CacheLRU
             value = default(Tvalue);
             return false;
         }
+
         public bool Remove(Tkey key)
         {
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
