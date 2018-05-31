@@ -101,25 +101,13 @@ namespace CacheLRU
             Dict.Clear();
         }
 
-        public bool Contains(KeyValuePair<Tkey, Tvalue> item)
-        {
-            throw new NotImplementedException();
-        }
+        public bool Contains(KeyValuePair<Tkey, Tvalue> item) => throw new NotImplementedException();
 
-        public bool ContainsKey(Tkey key)
-        {
-            return Dict.ContainsKey(key);
-        }
+        public bool ContainsKey(Tkey key) => Dict.ContainsKey(key);
 
-        public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
+        public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) => throw new NotImplementedException();
 
-        public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => throw new NotImplementedException();
 
         public bool Remove(Tkey key, out Tvalue value)
         {
@@ -162,10 +150,7 @@ namespace CacheLRU
             return false;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
     }
 
 }
