@@ -9,8 +9,8 @@ namespace CacheLRU
     {
         readonly int size;
         int count;
-        LinkedList<KeyValuePair<Tkey, Tvalue>> lru_order;
-        Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>> dict;
+        readonly LinkedList<KeyValuePair<Tkey, Tvalue>> lru_order;
+        readonly Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>> dict;
 
         public CacheLRU(int size)
         {
