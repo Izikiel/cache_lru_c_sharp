@@ -53,7 +53,7 @@ namespace CacheLRU
         public ICollection<Tvalue> Values => (ICollection<Tvalue>)from node in Dict.Values
                                                                   select node.Value.Value;
 
-        public int Count => this.Dict.Count;
+        public int Count => count;
 
         public bool IsReadOnly => false;
 
