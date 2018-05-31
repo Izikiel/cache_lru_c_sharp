@@ -135,7 +135,15 @@ namespace CacheLRU
             return false;
         }
 
-        public bool Remove(KeyValuePair<Tkey, Tvalue> item) => Remove(item.Key);
+        public bool Remove(KeyValuePair<Tkey, Tvalue> item)
+        {
+            if (Dict.ContainsKey(item.Key) &&
+                Dict[item.Key].Value.Value.Equals(item.Value))
+            {
+                return Remove(item.Key);
+            }
+            return false;
+        }
 
         public bool TryGetValue(Tkey key, out Tvalue value)
         {
