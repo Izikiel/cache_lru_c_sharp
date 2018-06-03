@@ -154,15 +154,14 @@ namespace CacheLRU
             return false;
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
-
         struct LRUEnumerator : IEnumerator<KeyValuePair<Tkey, Tvalue>>
         {
-
             Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator enumerator;
+
             public LRUEnumerator(Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator to_wrap) {
                 enumerator = to_wrap;
             }
+
             public KeyValuePair<Tkey, Tvalue> Current => enumerator.Current.Value.Value;
 
             object IEnumerator.Current => Current;
@@ -182,6 +181,9 @@ namespace CacheLRU
                 throw new NotSupportedException();
             }
         }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => new LRUEnumerator(Dict.GetEnumerator());
 
         public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) => throw new NotSupportedException();
