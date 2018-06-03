@@ -101,13 +101,10 @@ namespace CacheLRU
             Dict.Clear();
         }
 
-        public bool Contains(KeyValuePair<Tkey, Tvalue> item) => throw new NotImplementedException();
+        public bool Contains(KeyValuePair<Tkey, Tvalue> item) => Dict.ContainsKey(item.Key) &&
+                                                                 Dict[item.Key].Value.Value.Equals(item.Value);
 
         public bool ContainsKey(Tkey key) => Dict.ContainsKey(key);
-
-        public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) => throw new NotImplementedException();
-
-        public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => throw new NotImplementedException();
 
         public bool Remove(Tkey key, out Tvalue value)
         {
@@ -137,8 +134,7 @@ namespace CacheLRU
 
         public bool Remove(KeyValuePair<Tkey, Tvalue> item)
         {
-            if (Dict.ContainsKey(item.Key) &&
-                Dict[item.Key].Value.Value.Equals(item.Value))
+            if (Contains(item))
             {
                 return Remove(item.Key);
             }
@@ -158,7 +154,38 @@ namespace CacheLRU
             return false;
         }
 
-        IEnumerator IEnumerable.GetEnumerator() => throw new NotImplementedException();
+        IEnumerator IEnumerable.GetEnumerator() => this.GetEnumerator();
+
+        struct LRUEnumerator : IEnumerator<KeyValuePair<Tkey, Tvalue>>
+        {
+
+            Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator enumerator;
+            public LRUEnumerator(Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator to_wrap) {
+                enumerator = to_wrap;
+            }
+            public KeyValuePair<Tkey, Tvalue> Current => enumerator.Current.Value.Value;
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose()
+            {
+                enumerator.Dispose();
+            }
+
+            public bool MoveNext()
+            {
+                return enumerator.MoveNext();
+            }
+
+            public void Reset()
+            {
+                throw new NotSupportedException();
+            }
+        }
+        public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => new LRUEnumerator(Dict.GetEnumerator());
+
+        public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) => throw new NotSupportedException();
+
     }
 
 }
