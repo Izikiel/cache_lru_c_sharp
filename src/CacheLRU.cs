@@ -27,7 +27,7 @@ namespace CacheLRU
 
         private void RemoveLRU()
         {
-            if (Lru_order.Count == 0)
+            if (count == 0)
             {
                 return;
             }
