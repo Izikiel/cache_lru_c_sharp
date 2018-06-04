@@ -76,16 +76,7 @@ namespace CacheLRU
             {
                 throw new ArgumentException("Element already in cache");
             }
-
-            if (Dict.ContainsKey(item.Key))
-            {
-                Update(item.Key, item.Value);
-            }
-            else
-            {
-                var node = new LinkedListNode<KeyValuePair<Tkey, Tvalue>>(item);
-                Add(node);
-            }
+            Update(item.Key, item.Value);
         }
 
         private void Add(LinkedListNode<KeyValuePair<Tkey, Tvalue>> node)
