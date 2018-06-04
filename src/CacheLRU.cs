@@ -22,18 +22,6 @@ namespace CacheLRU
             this.capacity = capacity;
         }
 
-        private void RemoveLRU()
-        {
-            if (count == 0)
-            {
-                return;
-            }
-
-            Dict.Remove(Lru_order.First.Value.Key);
-            Lru_order.RemoveFirst();
-            count--;
-        }
-
         public Tvalue this[Tkey key]
         {
             get => Dict[key].Value.Value;
@@ -45,7 +33,8 @@ namespace CacheLRU
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
             var kv = new KeyValuePair<Tkey, Tvalue>(key, value);
 
-            if (Remove(key, out node)) {
+            if (Remove(key, out node))
+            {
                 node.Value = kv;
             }
             else
@@ -92,7 +81,8 @@ namespace CacheLRU
             {
                 Update(item.Key, item.Value);
             }
-            else {
+            else
+            {
                 var node = new LinkedListNode<KeyValuePair<Tkey, Tvalue>>(item);
                 Add(node);
             }
@@ -121,8 +111,15 @@ namespace CacheLRU
         public bool ContainsKey(Tkey key) => Dict.ContainsKey(key);
 
 
-        private bool Remove(Tkey key, out LinkedListNode<KeyValuePair<Tkey, Tvalue>> value) {
+        public bool Remove(Tkey key)
+        {
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
+            return Remove(key, out node);
+        }
+
+        private bool Remove(Tkey key, out LinkedListNode<KeyValuePair<Tkey, Tvalue>> value)
+        {
+            LinkedListNode<KeyValuePair<Tkey, Tvalue>> node = default;
             if (Dict.Remove(key, out node))
             {
                 Lru_order.Remove(node);
@@ -130,31 +127,19 @@ namespace CacheLRU
                 value = node;
                 return true;
             }
-            value = default(LinkedListNode<KeyValuePair<Tkey, Tvalue>>);
             return false;
         }
+
         public bool Remove(Tkey key, out Tvalue value)
         {
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
-
-            if (Remove(key, out node)) {
+            if (Remove(key, out node))
+            {
                 value = node.Value.Value;
                 return true;
             }
 
-            value = default(Tvalue);
-            return false;
-        }
-
-        public bool Remove(Tkey key)
-        {
-            LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
-            if (Dict.Remove(key, out node))
-            {
-                Lru_order.Remove(node);
-                count--;
-                return true;
-            }
+            value = default;
             return false;
         }
 
@@ -165,6 +150,18 @@ namespace CacheLRU
                 return Remove(item.Key);
             }
             return false;
+        }
+
+        private void RemoveLRU()
+        {
+            if (count == 0)
+            {
+                return;
+            }
+
+            Dict.Remove(Lru_order.First.Value.Key);
+            Lru_order.RemoveFirst();
+            count--;
         }
 
         public bool TryGetValue(Tkey key, out Tvalue value)
@@ -184,7 +181,8 @@ namespace CacheLRU
         {
             Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator enumerator;
 
-            public LRUEnumerator(Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator to_wrap) {
+            public LRUEnumerator(Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator to_wrap)
+            {
                 enumerator = to_wrap;
             }
 
@@ -212,7 +210,15 @@ namespace CacheLRU
 
         public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => new LRUEnumerator(Dict.GetEnumerator());
 
-        public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) => throw new NotSupportedException();
+        public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) {
+            var i = 0;
+
+            foreach (var key in Keys)
+            {
+                array[i+arrayIndex] = new KeyValuePair<Tkey, Tvalue>(key, Dict[key].Value.Value);
+                i++;
+            }
+        }
 
     }
 
