@@ -167,13 +167,13 @@ namespace CacheLRU
         public bool TryGetValue(Tkey key, out Tvalue value)
         {
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
-
+            value = default;
             if (Dict.TryGetValue(key, out node))
             {
                 value = node.Value.Value;
                 return true;
             }
-            value = default(Tvalue);
+            value = default;
             return false;
         }
 
