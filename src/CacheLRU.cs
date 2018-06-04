@@ -7,22 +7,19 @@ namespace CacheLRU
 {
     public class CacheLRU<Tkey, Tvalue> : IDictionary<Tkey, Tvalue>
     {
-        readonly int size;
-        int count;
-        readonly LinkedList<KeyValuePair<Tkey, Tvalue>> lru_order;
-        readonly Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>> dict;
+        readonly int capacity;
+        int count = 0;
+        readonly LinkedList<KeyValuePair<Tkey, Tvalue>> lru_order = new LinkedList<KeyValuePair<Tkey, Tvalue>>();
+        readonly Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>> dict = new Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>();
 
-        public CacheLRU(int size)
+        public CacheLRU(int capacity)
         {
-            if (size <= 0)
+            if (capacity <= 0)
             {
-                throw new ArgumentOutOfRangeException("size cannot be 0 or less");
+                throw new ArgumentOutOfRangeException("capacity cannot be 0 or less");
             }
 
-            this.size = size;
-            count = 0;
-            lru_order = new LinkedList<KeyValuePair<Tkey, Tvalue>>();
-            dict = new Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>();
+            this.capacity = capacity;
         }
 
         private void RemoveLRU()
@@ -45,8 +42,17 @@ namespace CacheLRU
 
         public void Update(Tkey key, Tvalue value)
         {
-            Remove(key);
-            Add(key, value);
+            LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
+            var kv = new KeyValuePair<Tkey, Tvalue>(key, value);
+
+            if (Remove(key, out node)) {
+                node.Value = kv;
+            }
+            else
+            {
+                node = new LinkedListNode<KeyValuePair<Tkey, Tvalue>>(kv);
+            }
+            Add(node);
         }
 
         public ICollection<Tkey> Keys => this.Dict.Keys;
@@ -55,6 +61,8 @@ namespace CacheLRU
                                                                   select node.Value.Value;
 
         public int Count => count;
+        public bool Contains(KeyValuePair<Tkey, Tvalue> item) => Dict.ContainsKey(item.Key) &&
+                                                                 Dict[item.Key].Value.Value.Equals(item.Value);
 
         public bool IsReadOnly => false;
 
@@ -67,29 +75,37 @@ namespace CacheLRU
             {
                 throw new ArgumentException("Element already in cache");
             }
-            if (count == size)
-            {
-                RemoveLRU();
-            }
             var pair = new KeyValuePair<Tkey, Tvalue>(key, value);
-            Add(pair);
+            var node = new LinkedListNode<KeyValuePair<Tkey, Tvalue>>(pair);
+            Add(node);
 
         }
 
         public void Add(KeyValuePair<Tkey, Tvalue> item)
         {
-            if (Dict.ContainsKey(item.Key))
+            if (Contains(item))
             {
                 throw new ArgumentException("Element already in cache");
             }
 
-            if (count == size)
+            if (Dict.ContainsKey(item.Key))
+            {
+                Update(item.Key, item.Value);
+            }
+            else {
+                var node = new LinkedListNode<KeyValuePair<Tkey, Tvalue>>(item);
+                Add(node);
+            }
+        }
+
+        private void Add(LinkedListNode<KeyValuePair<Tkey, Tvalue>> node)
+        {
+            if (count == capacity)
             {
                 RemoveLRU();
             }
 
-            var node = new LinkedListNode<KeyValuePair<Tkey, Tvalue>>(item);
-            Dict.Add(item.Key, node);
+            Dict.Add(node.Value.Key, node);
             Lru_order.AddLast(node);
             count++;
         }
@@ -101,21 +117,31 @@ namespace CacheLRU
             Dict.Clear();
         }
 
-        public bool Contains(KeyValuePair<Tkey, Tvalue> item) => Dict.ContainsKey(item.Key) &&
-                                                                 Dict[item.Key].Value.Value.Equals(item.Value);
 
         public bool ContainsKey(Tkey key) => Dict.ContainsKey(key);
 
-        public bool Remove(Tkey key, out Tvalue value)
-        {
+
+        private bool Remove(Tkey key, out LinkedListNode<KeyValuePair<Tkey, Tvalue>> value) {
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
             if (Dict.Remove(key, out node))
             {
                 Lru_order.Remove(node);
                 count--;
+                value = node;
+                return true;
+            }
+            value = default(LinkedListNode<KeyValuePair<Tkey, Tvalue>>);
+            return false;
+        }
+        public bool Remove(Tkey key, out Tvalue value)
+        {
+            LinkedListNode<KeyValuePair<Tkey, Tvalue>> node;
+
+            if (Remove(key, out node)) {
                 value = node.Value.Value;
                 return true;
             }
+
             value = default(Tvalue);
             return false;
         }
