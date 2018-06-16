@@ -110,15 +110,16 @@ namespace CacheLRU
 
         private bool Remove(Tkey key, out LinkedListNode<KeyValuePair<Tkey, Tvalue>> value)
         {
+            var removed = false;
             LinkedListNode<KeyValuePair<Tkey, Tvalue>> node = default;
             if (Dict.Remove(key, out node))
             {
                 Lru_order.Remove(node);
                 count--;
-                value = node;
-                return true;
+                removed = true;
             }
-            return false;
+            value = node;
+            return removed;
         }
 
         public bool Remove(Tkey key, out Tvalue value)
