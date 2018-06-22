@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace CacheLRU
 {
-    public class CacheLRU<Tkey, Tvalue> : IDictionary<Tkey, Tvalue>
+    public partial class CacheLRU<Tkey, Tvalue> : IDictionary<Tkey, Tvalue>
     {
         readonly int capacity;
         int count = 0;
@@ -169,40 +169,12 @@ namespace CacheLRU
             return false;
         }
 
-        struct LRUEnumerator : IEnumerator<KeyValuePair<Tkey, Tvalue>>
-        {
-            Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator enumerator;
-
-            public LRUEnumerator(Dictionary<Tkey, LinkedListNode<KeyValuePair<Tkey, Tvalue>>>.Enumerator to_wrap)
-            {
-                enumerator = to_wrap;
-            }
-
-            public KeyValuePair<Tkey, Tvalue> Current => enumerator.Current.Value.Value;
-
-            object IEnumerator.Current => Current;
-
-            public void Dispose()
-            {
-                enumerator.Dispose();
-            }
-
-            public bool MoveNext()
-            {
-                return enumerator.MoveNext();
-            }
-
-            public void Reset()
-            {
-                throw new NotSupportedException();
-            }
-        }
-
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => new LRUEnumerator(Dict.GetEnumerator());
 
         public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) {
+
             foreach (var key in Keys)
             {
                 array[arrayIndex++] = new KeyValuePair<Tkey, Tvalue>(key, Dict[key].Value.Value);
