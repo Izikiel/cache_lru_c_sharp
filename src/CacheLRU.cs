@@ -203,12 +203,9 @@ namespace CacheLRU
         public IEnumerator<KeyValuePair<Tkey, Tvalue>> GetEnumerator() => new LRUEnumerator(Dict.GetEnumerator());
 
         public void CopyTo(KeyValuePair<Tkey, Tvalue>[] array, int arrayIndex) {
-            var i = 0;
-
             foreach (var key in Keys)
             {
-                array[i+arrayIndex] = new KeyValuePair<Tkey, Tvalue>(key, Dict[key].Value.Value);
-                i++;
+                array[arrayIndex++] = new KeyValuePair<Tkey, Tvalue>(key, Dict[key].Value.Value);
             }
         }
 
